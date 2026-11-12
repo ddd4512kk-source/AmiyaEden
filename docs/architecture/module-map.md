@@ -2,7 +2,7 @@
 status: active
 doc_type: architecture
 owner: engineering
-last_reviewed: 2026-07-22
+last_reviewed: 2026-11-11
 source_of_truth:
   - server/internal
   - server/pkg
@@ -76,6 +76,15 @@ React 迁移侧对应职责：
 | `docs/reference/` | 参考资产，不作为当前实现裁决依据 |
 
 ## 常见任务落点
+
+### 修改军团加入申请
+
+通常需要一起看：
+
+1. `server/internal/model/admission.go`
+2. `server/internal/repository/admission.go`
+3. `server/bootstrap/admission_migration.go`
+4. [军团加入申请](../features/current/corporation-admissions.md)
 
 ### 新增后端接口
 
@@ -159,3 +168,5 @@ React 迁移侧对应职责：
 3. 对应 service
 4. 对应 repository / api wrapper
 5. 关联类型与文档边界
+
+统一工资管理：`service/salary.go`、`handler/salary.go`、`model/salary.go` 和 `bootstrap/salary_migration.go`；双端 `/system/salary`。各业务最终完成事务调用工资服务，不在审批初审或自动发放路径计操作工资；参见[工资管理](../features/current/operation-salaries.md)。

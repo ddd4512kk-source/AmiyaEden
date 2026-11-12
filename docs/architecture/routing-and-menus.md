@@ -2,7 +2,7 @@
 status: active
 doc_type: architecture
 owner: frontend
-last_reviewed: 2026-08-01
+last_reviewed: 2026-11-11
 source_of_truth:
   - static/src/router/core
   - static/src/router/routes
@@ -98,6 +98,10 @@ Vue 通过 `v-auth` 或权限 hook 消费 `meta.authList` 语义。React 由叶�
 
 ## 当前不变量
 
+军团申请在双端新增 `/admissions/new`、`alt`、`history`、`applications/:id` 和 `review`。创建及审核入口使用 admission context，未知／失败时关闭并允许重试，会话或人物信息刷新后重新读取；历史入口始终为已登录 owner 保留。Vue 菜单仅更新可见性，不移除这些路由，以保证资格变化后的历史可达；React route gate 使用同一 context。审核范围最终由服务端执行，详见[军团申请](../features/current/corporation-admissions.md)。
+
+Vue 的 admission context 后台刷新保留当前账号已经取得的结果，合并并发请求；菜单权限未改变时保留菜单对象，不先隐藏再显示子项，申请表单也不因刷新而卸载。请求失败时关闭受限入口；退出或切换账号立即清空结果并忽略旧账号的迟到响应。管理与历史列表沿用 `ElCard`、`ElTabs`、`ArtTableHeader` 和 `ArtTable` 的现有页面样式。
+
 - `新人选队长` 仅受前端静态路由过滤影响，通过 `meta.requiresNewbro = true` 和后端返回的 `is_currently_newbro` 状态控制访问权限
 - `队长管理` 页面允许 `captain` 进入只读页签，但不能因此绕过后端的管理权限边界
 - `招新链接` 页面为 `admin` / `super_admin` 追加 `全部链接` 与 `链接设置` tab，但不新增独立系统管理路由
@@ -105,3 +109,5 @@ Vue 通过 `v-auth` 或权限 hook 消费 `meta.authList` 语义。React 由叶�
 - `伏羲中心 / Fuxi Center` 当前被前端路由标记为 `meta.isHide = true`，因此暂时不在导航和全局搜索中展示，但直达路由仍保留
 - 路由改动若涉及权限边界，必须同步更新 API / feature 文档
 - 路由架构说明只维护在 `docs/` 中
+
+工资管理在 Vue／React 的 `/system/salary`，仅 admin／super_admin 并沿用 `system.manage` 能力边界。军团申请 `AdmissionReview`／`/admissions/review` 接入 `admission_pending`，由既有父菜单汇总。详情和 `/admissions/applications/:id/edit` 使用独立路由，编辑入口限 owner 且未已邀请。
