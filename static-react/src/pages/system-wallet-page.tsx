@@ -1,3 +1,4 @@
+import { walletReason } from '@/lib/wallet-reason'
 import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
@@ -251,8 +252,12 @@ export function SystemWalletPage() {
             <span className="text-sm text-muted-foreground">{t('walletAdmin.fields.action')}</span>
             <Select
               selectedKey={String(adjustForm.action ?? '')}
-              onSelectionChange={(key) => ((value) =>
-                setAdjustForm((current) => ({ ...current, action: value as AdjustAction })))(String(key))}
+              onSelectionChange={(key) =>
+                ((value) =>
+                  setAdjustForm((current) => ({ ...current, action: value as AdjustAction })))(
+                  String(key)
+                )
+              }
             >
               <SelectTrigger className="h-10">
                 <SelectValue />
@@ -547,7 +552,11 @@ function WalletTransactionsPanel({
             onChange={(event) => setUserId(event.target.value ? Number(event.target.value) : '')}
             placeholder={t('walletAdmin.placeholders.targetUserId')}
           />
-          <Select selectedKey={String(refType ?? '')} onSelectionChange={(key) => ((value) => setRefType(value))(String(key))}>
+          <Select
+            aria-label={t('walletAdmin.placeholders.refType')}
+            selectedKey={String(refType ?? '')}
+            onSelectionChange={(key) => ((value) => setRefType(value))(String(key))}
+          >
             <SelectTrigger className="h-10">
               <SelectValue />
             </SelectTrigger>
@@ -565,6 +574,10 @@ function WalletTransactionsPanel({
                 'shop_refund',
                 'newbro_captain_reward',
                 'mentor_reward',
+                'welfare_delivery_salary',
+                'shop_delivery_salary',
+                'srp_payout_salary',
+                'recruitment_invitation_salary',
               ].map((value) => (
                 <SelectItem key={value} id={String(value ?? '')}>
                   {refTypeLabel(t, value)}
@@ -648,7 +661,7 @@ function WalletTransactionsPanel({
                     </span>
                   </TableCell>
                   <TableCell className="px-3 py-2">{formatCoin(row.balance_after)}</TableCell>
-                  <TableCell className="px-3 py-2">{row.reason || '-'}</TableCell>
+                  <TableCell className="px-3 py-2">{walletReason(row, t)}</TableCell>
                   <TableCell className="px-3 py-2">
                     <span
                       className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${refTypeTone(row.ref_type)}`}
@@ -750,7 +763,10 @@ function WalletLogsPanel({
             onChange={(event) => setTargetUid(event.target.value)}
             placeholder={t('walletAdmin.placeholders.targetUserId')}
           />
-          <Select selectedKey={String(action ?? '')} onSelectionChange={(key) => ((value) => setAction(value))(String(key))}>
+          <Select
+            selectedKey={String(action ?? '')}
+            onSelectionChange={(key) => ((value) => setAction(value))(String(key))}
+          >
             <SelectTrigger className="h-10">
               <SelectValue />
             </SelectTrigger>
@@ -835,7 +851,7 @@ function WalletLogsPanel({
                   <TableCell className="px-3 py-2">{formatCoin(row.amount)}</TableCell>
                   <TableCell className="px-3 py-2">{formatCoin(row.before)}</TableCell>
                   <TableCell className="px-3 py-2">{formatCoin(row.after)}</TableCell>
-                  <TableCell className="px-3 py-2">{row.reason || '-'}</TableCell>
+                  <TableCell className="px-3 py-2">{walletReason(row, t)}</TableCell>
                   <TableCell className="px-3 py-2">{formatDateTime(row.created_at)}</TableCell>
                 </TableRow>
               ))}
@@ -893,6 +909,10 @@ function WalletAnalysisPanel({
     'newbro_captain_reward',
     'mentor_reward',
     'recruit_link_reward',
+    'welfare_delivery_salary',
+    'shop_delivery_salary',
+    'srp_payout_salary',
+    'recruitment_invitation_salary',
   ]
 
   const loadData = useCallback(async () => {
@@ -1170,10 +1190,12 @@ function Pager({
         <span>{t('welfareMy.pageSize')}</span>
         <Select
           selectedKey={String(pageSize ?? '')}
-          onSelectionChange={(key) => ((value) => {
-            setPageSize(Number(value))
-            setPage(1)
-          })(String(key))}
+          onSelectionChange={(key) =>
+            ((value) => {
+              setPageSize(Number(value))
+              setPage(1)
+            })(String(key))
+          }
         >
           <SelectTrigger className="h-8">
             <SelectValue />
